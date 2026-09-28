@@ -14,7 +14,7 @@ html {
 
 body {
     background: transparent;
-    color: #633f4d;
+    color: oklab(41.729% 0.05331 -0.00342);
     font-family: "Quicksand", sans-serif;
     overflow-x: hidden;
 }
@@ -69,7 +69,7 @@ body {
     background: rgba(238, 174, 238, 0.295);
 
     box-shadow:
-        0 0 10px white;
+        0 0 10px oklab(41.729% 0.05331 -0.00342)
 
     animation:
         twinkle 3s infinite ease-in-out;
@@ -937,6 +937,22 @@ section {
     }
 }
 
+.yes-gif {
+    display: block;
+
+    width: 200px;
+    max-width: 60%;
+    height: auto;
+
+    margin: 25px auto;
+
+    border-radius: 28px;
+
+    box-shadow:
+        0 12px 30px
+        rgba(100, 50, 70, .2);
+}
+
 .celebration-cats {
     font-size: 50px;
 
@@ -983,6 +999,103 @@ section {
 
     margin: auto;
 }
+
+/* =====================================
+   MESSAGE BOX ON THE YES SCREEN
+===================================== */
+
+.message-box {
+    margin-top: 30px;
+
+    padding-top: 25px;
+
+    border-top:
+        1px dashed
+        rgba(210, 130, 160, .35);
+}
+
+.message-label {
+    font-family: "Quicksand", sans-serif;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    color: #856573;
+
+    margin-bottom: 14px;
+}
+
+.message-input {
+    width: 100%;
+    max-width: 460px;
+
+    padding: 16px 22px;
+
+    border-radius: 26px;
+
+    border:
+        1.5px solid
+        rgba(205, 135, 160, .45);
+
+    background: rgba(255, 255, 255, .85);
+
+    font-family: "Quicksand", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+
+    color: #684451;
+
+    resize: vertical;
+
+    outline: none;
+
+    transition: .3s;
+}
+
+.message-input::placeholder {
+    color: #b795a3;
+}
+
+.message-input:focus {
+    border-color: #ed86aa;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(237, 134, 170, .2);
+}
+
+.message-input:disabled {
+    opacity: .6;
+}
+
+#sendMessageBtn {
+    margin-top: 16px;
+}
+
+#sendMessageBtn:disabled {
+    opacity: .55;
+
+    cursor: default;
+}
+
+.message-sent {
+    display: none;
+
+    margin-top: 14px;
+
+    color: #4f9d72;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.message-sent.show {
+    display: block;
+
+    animation:
+        popup .5s ease;
+}
+
 
 .close-button {
     margin-top: 30px;
@@ -1110,6 +1223,26 @@ section {
 
 .locked {
     display: none !important;
+}
+
+
+/* clipped holder for floaters inside popups: keeps them from
+   changing the popup's size or scroll, so the card never moves */
+
+.float-holder {
+    position: absolute;
+    inset: 0;
+
+    overflow: hidden;
+
+    pointer-events: none;
+
+    z-index: -2;
+}
+
+.float-holder .floating-heart,
+.float-holder .floating-waguri {
+    position: absolute;
 }
 
 

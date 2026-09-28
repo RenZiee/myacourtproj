@@ -19,17 +19,41 @@ const yesScreen =
    they are open.)
 ===================================== */
 
+function getHolder(layer) {
+
+    if (layer === document.body) {
+        return layer;
+    }
+
+    /* each popup gets its own clipped holder, so floaters can
+       never stretch the popup's scroll area or push the card */
+
+    let holder =
+        layer.querySelector(":scope > .float-holder");
+
+    if (!holder) {
+
+        holder = document.createElement("div");
+
+        holder.classList.add("float-holder");
+
+        layer.prepend(holder);
+    }
+
+    return holder;
+}
+
 function getLayer() {
 
     if (yesScreen.style.display === "flex") {
-        return yesScreen;
+        return getHolder(yesScreen);
     }
 
     const openLayer =
         document.querySelector(".letter-section.open");
 
     if (openLayer) {
-        return openLayer;
+        return getHolder(openLayer);
     }
 
     return document.body;
@@ -74,6 +98,8 @@ function sayYes() {
     for (let i = 0; i < 6; i++) {
         setTimeout(createWaguri, i * 400);
     }
+
+    notifyAnswer("YES! 💗");
 }
 
 
@@ -87,6 +113,8 @@ function sayMaybe() {
         document.getElementById("maybeScreen");
 
     screen.style.display = "flex";
+
+    notifyAnswer("Let me think 🥺");
 }
 
 
@@ -567,4 +595,133 @@ function sayNo() {
         noBtn,
         Math.max(NO_MIN_SCALE, 1 - noClicks * NO_SHRINK_STEP)
     );
+
+    /* tell you she clicked No (first click only, no spam) */
+    if (noClicks === 1) {
+        notifyAnswer("No 🥺 (clicked once)", "no1");
+    }
+
+    /* 3rd click -> "Are you sure?" popup */
+    if (noClicks === 3) {
+
+        notifyAnswer(
+            "No 🥺 (3 clicks, got the 'Are you sure?' message)",
+            "no3"
+        );
+
+        openPopup(sureScreen);
+    }
+}
+
+const sureScreen =
+    document.getElementById("sureScreen");
+
+document.getElementById("sureBtn")
+    .addEventListener("click", () => {
+
+        closePopup(sureScreen);
+    });
+
+
+/* =====================================
+   SEND HER MESSAGE  (Yes screen textbox)
+===================================== */
+
+const messageInput =
+    document.getElementById("messageInput");
+
+const sendMessageBtn =
+    document.getElementById("sendMessageBtn");
+
+const messageSentText =
+    document.getElementById("messageSentText");
+
+sendMessageBtn.addEventListener("click", () => {
+
+    const text = messageInput.value.trim();
+
+    if (!text) {
+        messageInput.focus();
+        return;
+    }
+
+    sendMessageBtn.disabled = true;
+    sendMessageBtn.textContent = "Sending...";
+
+    fetch(
+        `https://formsubmit.co/ajax/${NOTIFY_EMAIL}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json"
+            },
+            body: JSON.stringify({
+                _subject: "She left you a message! 💌",
+                message: text,
+                time: new Date().toLocaleString()
+            })
+        }
+    )
+        .then(() => {
+
+            messageInput.disabled = true;
+            sendMessageBtn.style.display = "none";
+
+            messageSentText.classList.add("show");
+        })
+        .catch(() => {
+
+            sendMessageBtn.disabled = false;
+            sendMessageBtn.textContent = "Send it to me ♡";
+
+            messageSentText.textContent =
+                "Hmm, that didn't send 🥺 try again?";
+
+            messageSentText.classList.add("show");
+        });
+});
+
+
+/* =====================================
+   EMAIL NOTIFICATION (FormSubmit.co)
+   Sends you an email the moment she
+   clicks an answer. No backend needed.
+===================================== */
+
+const NOTIFY_EMAIL =
+    "lorenzopenarubia12@gmail.com";
+
+function notifyAnswer(answer, key) {
+
+    /* each kind of answer is sent once, so clicking
+       around never spams your inbox, but a Yes after a
+       Let me think still reaches you */
+
+    const id = "sent:" + (key || answer);
+
+    if (sessionStorage.getItem(id)) {
+        return;
+    }
+
+    sessionStorage.setItem(id, "1");
+
+    fetch(
+        `https://formsubmit.co/ajax/${NOTIFY_EMAIL}`,
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json"
+            },
+            body: JSON.stringify({
+                _subject: "She answered: " + answer,
+                answer: answer,
+                time: new Date().toLocaleString()
+            })
+        }
+    ).catch(() => {
+        /* if it fails (e.g. offline), fail silently
+           so it never breaks her experience */
+    });
 }
