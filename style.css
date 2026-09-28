@@ -886,9 +886,16 @@ section {
     display: none;
 
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
 
-    padding: 25px;
+    /* let the screen scroll when the card is taller than the phone */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+
+    padding: 25px 18px;
 
     text-align: center;
 
@@ -902,7 +909,12 @@ section {
 
 .yes-content,
 .maybe-content {
+    width: 100%;
     max-width: 650px;
+
+    /* margin:auto centers it when short, and lets it scroll from the
+       top (with its full border) when tall */
+    margin: auto;
 
     padding: 45px;
 
@@ -1045,7 +1057,9 @@ section {
 
     color: #684451;
 
-    resize: vertical;
+    resize: none;
+    display: block;
+    margin: 0 auto;
 
     outline: none;
 
@@ -1070,6 +1084,26 @@ section {
 
 #sendMessageBtn {
     margin-top: 16px;
+}
+
+/* same gap above both buttons, same size */
+.yes-content > .close-button {
+    display: block;
+    margin: 16px auto 0;
+}
+
+.yes-content .message-box .close-button,
+.yes-content > .close-button {
+    min-width: 200px;
+}
+
+.message-box {
+    margin-bottom: 0;
+}
+
+/* hearts/waguri stay fixed while the yes screen scrolls */
+.yes-screen .float-holder {
+    position: fixed;
 }
 
 #sendMessageBtn:disabled {
@@ -1620,5 +1654,23 @@ footer {
 
     .section-head h2 {
         font-size: 38px;
+    }
+}
+
+
+/* =====================================
+   YES SCREEN - PHONE FIXES
+===================================== */
+
+@media (max-width: 650px) {
+
+    .yes-content,
+    .maybe-content {
+        padding: 30px 18px;
+        border-radius: 28px;
+    }
+
+    .yes-content h2 {
+        font-size: 48px;
     }
 }
